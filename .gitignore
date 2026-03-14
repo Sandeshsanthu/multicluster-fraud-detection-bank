@@ -1,0 +1,28 @@
+# --- Python Specific ---
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+env/
+venv/
+.env
+
+# --- Data & Artifacts (Keep the folders, ignore the files) ---
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+models/*.joblib
+models/*.json
+reports/figures/*.png
+reports/metrics/*.json
+
+# --- Docker & OS ---
+.dockerignore
+.DS_Store
+Thumbs.db
+
+# --- IDE Specific ---
+.vscode/
+.idea/
+*.swp
