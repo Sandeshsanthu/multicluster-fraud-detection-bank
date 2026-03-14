@@ -1,15 +1,19 @@
-# src/api.py
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-import joblib, json, numpy as np
+import joblib, json, os
 import pandas as pd
+import numpy as np
 
 app = FastAPI(title='Fraud Detection API')
 
+# Use environment variable or default path for Docker
+MODEL_PATH = os.getenv('MODEL_PATH', 'models/fraud_pipeline.joblib')
+THRESHOLD_PATH = 'models/threshold.json'
+
 # Load model and threshold at startup
-pipeline = joblib.load('models/fraud_pipeline.joblib')
-with open('models/threshold.json') as f:
-    THRESHOLD = json.load(f)['threshold']
+pipeline = joblib.load(MODEL_PATH)
+with open(THRESHOLD_PATH) as f:
+    THRESHOLD = json.load(f).get('threshold', 0.5)
 
 class Transaction(BaseModel):
     transaction_id: str
@@ -18,13 +22,18 @@ class Transaction(BaseModel):
     merchant_category: str
     user_id: int
     hour_of_day: int
-    # add your other features here
 
 @app.post('/score')
 def score_transaction(tx: Transaction):
+    # Convert Pydantic model to DataFrame for the pipeline
     df = pd.DataFrame([tx.dict()])
+    
+    # Get probability of class 1 (Fraud)
     prob = pipeline.predict_proba(df)[0][1]
-    decision = 'BLOCKED' if prob >= THRESHOLD 
+    
+    # FIX: Added the mandatory 'else' clause
+    decision = 'BLOCKED' if prob >= THRESHOLD else 'APPROVED'
+    
     return {
         'transaction_id': tx.transaction_id,
         'fraud_probability': round(float(prob), 4),
@@ -33,4 +42,5 @@ def score_transaction(tx: Transaction):
     }
 
 @app.get('/health')
-def health(): return {'status': 'ok'}
+def health(): 
+    return {'status': 'ok'}
