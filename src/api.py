@@ -22,6 +22,10 @@ class Transaction(BaseModel):
     merchant_category: str
     user_id: int
     hour_of_day: int
+    country: str
+    ip_risk_score: float
+    hour: int
+    device_risk_score: float
 
 @app.post('/score')
 def score_transaction(tx: Transaction):
