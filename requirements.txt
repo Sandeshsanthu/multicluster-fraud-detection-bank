@@ -6,3 +6,6 @@ seaborn
 joblib
 shap
 streamlit
+gunicorn
+# or
+gunicorn==25.1.0
