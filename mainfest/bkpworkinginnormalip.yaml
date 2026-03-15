@@ -16,6 +16,7 @@ spec:
     spec:
       containers:
       - name: fraud-api
+        # Updated to your Docker Hub repository
         image: docker.io/sandeshs/fraud-api:v1
         env:
         - name: MODEL_PATH
@@ -33,7 +34,7 @@ spec:
           httpGet:
             path: /health
             port: 8000
-          initialDelaySeconds: 45
+          initialDelaySeconds: 45 # Increased slightly to allow model loading
         readinessProbe:
           httpGet:
             path: /health
@@ -45,16 +46,10 @@ kind: Service
 metadata:
   name: fraud-api-svc
   namespace: fraud-detection
-  annotations:
-    # 1. Links the Load Balancer directly to Pods
-    cloud.google.com/neg: '{"exposed_ports": {"80":{}}}'
-    # 2. Explicitly tells the Gateway that this port is HTTP
-    cloud.google.com: '{"fraud-api-port":"HTTP"}'
 spec:
   selector:
     app: fraud-api
   ports:
-  - name: fraud-api-port # Named port for the controller to track
-    port: 80
+  - port: 80
     targetPort: 8000
   type: ClusterIP
