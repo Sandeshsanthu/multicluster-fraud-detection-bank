@@ -1,4 +1,3 @@
-# mainfest/fraud-api-deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -16,19 +15,22 @@ spec:
     spec:
       containers:
       - name: fraud-api
-        image: docker.io/sandeshs/fraud-api:v1
+        image: docker.io/sandeshs/fraud-api:v2
+        imagePullPolicy: Always # Ensures GKE pulls the fresh v1 if you re-pushed it
         env:
         - name: MODEL_PATH
           value: "models/fraud_pipeline.joblib"
+        - name: REDIS_HOST
+          value: "redis-service" # This must match the Redis Service name
         ports:
         - containerPort: 8000
         resources:
           requests:
+            cpu: '100m'
+            memory: '256Mi'
+          limits:
             cpu: '500m'
             memory: '512Mi'
-          limits:
-            cpu: '2000m'
-            memory: '2Gi'
         livenessProbe:
           httpGet:
             path: /health
@@ -46,15 +48,12 @@ metadata:
   name: fraud-api-svc
   namespace: fraud-detection
   annotations:
-    # 1. Links the Load Balancer directly to Pods
     cloud.google.com/neg: '{"exposed_ports": {"80":{}}}'
-    # 2. Explicitly tells the Gateway that this port is HTTP
-    cloud.google.com: '{"fraud-api-port":"HTTP"}'
 spec:
   selector:
     app: fraud-api
   ports:
-  - name: fraud-api-port # Named port for the controller to track
+  - name: fraud-api-port
     port: 80
     targetPort: 8000
   type: ClusterIP
