@@ -16,13 +16,10 @@ spec:
     spec:
       containers:
       - name: fraud-api
-        # Using the Artifact Registry image we just built
-        image: us-central1-docker.pkg.dev/project-d1a95002-78b0-493b-b7e/fraud-repo/fraud-api:v10
+        image: docker.io/sandeshs/fraud-api:v1
         env:
         - name: MODEL_PATH
           value: "models/fraud_pipeline.joblib"
-        - name: REDIS_HOST
-          value: "redis-service" # This must match your Redis Service name
         ports:
         - containerPort: 8000
         resources:
@@ -49,12 +46,15 @@ metadata:
   name: fraud-api-svc
   namespace: fraud-detection
   annotations:
+    # 1. Links the Load Balancer directly to Pods
     cloud.google.com/neg: '{"exposed_ports": {"80":{}}}'
+    # 2. Explicitly tells the Gateway that this port is HTTP
+    cloud.google.com: '{"fraud-api-port":"HTTP"}'
 spec:
   selector:
     app: fraud-api
   ports:
-  - name: fraud-api-port
+  - name: fraud-api-port # Named port for the controller to track
     port: 80
     targetPort: 8000
-  type: ClusterIP # Changed to ClusterIP because you are using NEG/Gateway
+  type: ClusterIP
