@@ -1,0 +1,22 @@
+#fraud-consumer-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fraud-consumer
+  namespace: fraud-detection
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: fraud-consumer}
+  template:
+    metadata:
+      labels: {app: fraud-consumer}
+    spec:
+      containers:
+      - name: fraud-consumer
+        image: docker.io/sandeshs/fraud-consumer:v1
+        env:
+        - name: KAFKA_BROKERS
+          value: "kafka-service:9092"
+        - name: REDIS_HOST
+          value: "34.118.238.237"

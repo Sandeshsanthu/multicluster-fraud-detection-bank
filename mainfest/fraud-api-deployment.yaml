@@ -15,13 +15,13 @@ spec:
     spec:
       containers:
       - name: fraud-api
-        image: docker.io/sandeshs/fraud-api:v2
+        image: docker.io/sandeshs/fraud-api:v3
         imagePullPolicy: Always # Ensures GKE pulls the fresh v1 if you re-pushed it
         env:
         - name: MODEL_PATH
           value: "models/fraud_pipeline.joblib"
         - name: REDIS_HOST
-          value: "redis-service" # This must match the Redis Service name
+          value: "34.118.238.237"
         ports:
         - containerPort: 8000
         resources:

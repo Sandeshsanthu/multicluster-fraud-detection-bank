@@ -1,0 +1,7 @@
+#redis-export.yaml
+# mainfest/redis-export.yaml
+kind: ServiceExport
+apiVersion: net.gke.io/v1
+metadata:
+  namespace: fraud-detection
+  name: redis-service
