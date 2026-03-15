@@ -134,3 +134,7 @@ gcloud compute health-checks update http gkemcg1-fraud-detection-fraud-api-svc-8
 
 checking 
  gcloud compute health-checks list --filter="name~fraud-api" --format="table(name, httpHealthCheck.port, httpHealthCheck.requestPath)"
+
+
+
+kubectl --context=cluster-a get gateway -A
