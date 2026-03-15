@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fraud-consumer
+  namespace: fraud-detection
+spec:
+  replicas: 1
+  # ADDED THIS SELECTOR BLOCK
+  selector:
+    matchLabels:
+      app: fraud-consumer
+  # UPDATED TEMPLATE METADATA
+  template:
+    metadata:
+      labels:
+        app: fraud-consumer
+    spec:
+      containers:
+      - name: fraud-consumer
+        image: docker.io/sandeshs/fraud-consumer:v1
+        env:
+        - name: KAFKA_BROKERS
+          # Use the ServiceImport IP you found for Kafka in Cluster B
+          value: "34.118.229.56:9092" 
+        - name: REDIS_HOST
+          # Your verified Shared Redis IP
+          value: "34.118.238.237"
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "256Mi"
